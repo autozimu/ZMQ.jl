@@ -5,11 +5,11 @@ module ZMQ
 using Base
 import Base.convert, Base.ref, Base.get, Base.bytestring
 
-export 
+export
     #Types
     ZMQStateError,ZMQContext,ZMQSocket,ZMQMessage,
     #functions
-    version,close, get, set, bind, connect,send,recv,convert, ref, 
+    version,close, get, set, bind, connect,send,recv,convert, ref,
     #Constants
     ZMQ_IO_THREADS,ZMQ_MAX_SOCKETS,ZMQ_PAIR,ZMQ_PUB,ZMQ_SUB,ZMQ_REQ,ZMQ_REP,ZMQ_DEALER,ZMQ_DEALER,ZMQ_PULL,ZMQ_PUSH,ZMQ_XPUB,ZMQ_XPUB,ZMQ_XREQ,ZMQ_XREP,ZMQ_UPSTREAM,ZMQ_DOWNSTREAM,ZMQ_MORE,ZMQ_MORE,ZMQ_SNDMORE,ZMQ_POLLIN,ZMQ_POLLOUT,ZMQ_POLLERR,ZMQ_STREAMER,ZMQ_FORWARDER,ZMQ_QUEUE
 
@@ -35,7 +35,7 @@ function jl_zmq_error_str()
     if c_strerror != C_NULL
         strerror = bytestring(c_strerror)
         return strerror
-    else 
+    else
         return "Unknown error"
     end
 end
@@ -181,7 +181,7 @@ if major > 2 || (major == 2 && minor > 1)
     (:set_sndtimeo,                :get_sndtimeo,                28,   ip)
     })
 end
-    
+
 for (fset, fget, k, p) in opslist
     if fset != nothing
         @eval global ($fset)
@@ -207,7 +207,7 @@ for (fset, fget, k, p) in opslist
             end
             return int(($p)[1])
         end
-    end        
+    end
 end
 # For some functions, the publicly-visible versions should require &
 # return boolean
@@ -251,7 +251,7 @@ for (fset, fget, k) in opslist
             if rc != 0
                 throw(ZMQStateError(jl_zmq_error_str()))
             end
-        end      
+        end
     end
     if fget != nothing
         @eval global ($fget)
@@ -265,10 +265,10 @@ for (fset, fget, k) in opslist
             end
             return bytestring(convert(Ptr{Uint8}, $u8ap), int(($sz)[1]))
         end
-    end        
+    end
 end
 end  # let
-    
+
 
 
 function bind(socket::ZMQSocket, endpoint::String)
@@ -411,8 +411,8 @@ function send(socket::ZMQSocket, zmsg::ZMQMessage, flag::Integer)
     end
 end
 function send(socket::ZMQSocket, msg::String, flag::Integer)
-    rc = ccall((:zmq_send, :libzmq), Int32, 
-            (Ptr{Void}, Ptr{Uint8}, Uint, Int32), 
+    rc = ccall((:zmq_send, :libzmq), Int32,
+            (Ptr{Void}, Ptr{Uint8}, Uint, Int32),
             socket.data, msg, length(msg), flag)
     if rc == -1
         throw(ZMQStateError(jl_zmq_error_str()))
@@ -476,10 +476,10 @@ const ZMQ_PULL = 7
 const ZMQ_PUSH = 8
 const ZMQ_XPUB = 9
 const ZMQ_XSUB = 10
-const ZMQ_XREQ = ZMQ_DEALER        
-const ZMQ_XREP = ZMQ_ROUTER        
-const ZMQ_UPSTREAM = ZMQ_PULL      
-const ZMQ_DOWNSTREAM = ZMQ_PUSH    
+const ZMQ_XREQ = ZMQ_DEALER
+const ZMQ_XREP = ZMQ_ROUTER
+const ZMQ_UPSTREAM = ZMQ_PULL
+const ZMQ_DOWNSTREAM = ZMQ_PUSH
 
 #Message options
 const ZMQ_MORE = 1
